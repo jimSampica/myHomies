@@ -4,14 +4,15 @@ const vm = require('node:vm');
 const fs = require('node:fs');
 const path = require('node:path');
 const {extractRelationships} = require('../relationships.js');
-function harness(stored = {}) {
+function harness(stored = {}, currentUrl) {
   const listeners = {}, writes = [], messages = [];
+  let senderUrl;
   let filter;
   const browser = {
     storage: {local: {get: async () => stored, set: async data => {Object.assign(stored, data);}}},
     webRequest: {onBeforeRequest: {addListener: fn => listeners.request = fn},
       filterResponseData: () => (filter = {write: data => writes.push(data), close() {this.closed = true;}})},
-    tabs: {sendMessage: async (tab, message) => {messages.push({tab, message});},
+    tabs: {get: async () => ({url: currentUrl || senderUrl}), sendMessage: async (tab, message) => {messages.push({tab, message});},
       onRemoved: {addListener: fn => listeners.remove = fn}, onUpdated: {addListener: fn => listeners.update = fn}},
     runtime: {onMessage: {addListener: fn => listeners.message = fn}}
   };
@@ -19,6 +20,7 @@ function harness(stored = {}) {
   return {listeners, writes, messages, begin(tabId = 1) {listeners.request({tabId, method: 'GET', requestId: 'r'}); return filter;},
     snapshot(tabId = 1, owner) {return listeners.message({type: 'snapshot', tabId, owner}, {});},
     save(owner, handles, route = `/${owner}/followers`) {
+      senderUrl = `https://x.com${route}`;
       return listeners.message({type: 'cacheFollowers', owner, handles}, {tab: {id: 1}, url: `https://x.com${route}`});
     }};
 }
@@ -65,9 +67,20 @@ test('follower cache survives reload and background restart, remains account sco
 });
 test('only accepts cache batches from the matching followers route', async () => {
   const h = harness();
-  assert.equal(await h.save('Me', ['Alice'], '/Other/followers'), undefined);
-  assert.equal(await h.save('Me', ['Alice'], '/Me/following'), undefined);
+  assert.match((await h.save('Me', ['Alice'], '/Other/followers')).error, /Followers page/);
+  assert.match((await h.save('Me', ['Alice'], '/Me/following')).error, /Followers page/);
   assert.equal((await h.snapshot(1, 'me')).cached, 0);
+});
+test('uses current tab URL after X SPA navigation instead of stale sender URL', async () => {
+  const h = harness({}, 'https://x.com/JamesSampica/followers');
+  const result = await h.save('JamesSampica', ['Alice'], '/home');
+  assert.equal(result.count, 1);
+});
+test('rejects save after navigating away even if sender URL still says followers', async () => {
+  const h = harness({}, 'https://x.com/home');
+  const result = await h.save('JamesSampica', ['Alice']);
+  assert.match(result.error, /Followers page/);
+  assert.equal((await h.snapshot(1, 'JamesSampica')).cached, 0);
 });
 test('fresh explicit false overrides old follower cache for the tab', async () => {
   const h = harness();

@@ -60,10 +60,23 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
   if (!Number.isInteger(tabId)) return;
   const session = sessionFor(tabId);
   if (message.type === 'cacheFollowers') {
-    if (!sender.tab || !validHandle(message.owner) || !Array.isArray(message.handles)) return;
-    const route = new URL(sender.url || sender.tab.url).pathname;
+    if (!sender.tab || !validHandle(message.owner) || !Array.isArray(message.handles)) {
+      return {error: 'Invalid follower-cache request. Reload X and try again.'};
+    }
+    // X changes routes without replacing the document. The sender's document URL
+    // can lag behind that navigation; query the live tab instead.
+    let page;
+    try {
+      const tab = await browser.tabs.get(tabId);
+      page = new URL(tab.url);
+    } catch {
+      return {error: 'Unable to read the current X tab URL. Check extension access to x.com, then reload X.'};
+    }
+    const route = page.pathname.toLowerCase().replace(/\/$/, '');
     const owner = message.owner.toLowerCase();
-    if (route.toLowerCase() !== `/${owner}/followers` && route.toLowerCase() !== `/${owner}/followers/`) return;
+    if (page.origin !== 'https://x.com' || route !== `/${owner}/followers`) {
+      return {error: `Open your Followers page (/${owner}/followers). Current path detected: ${page.pathname}`};
+    }
     if (!caches.has(owner)) caches.set(owner, new Map());
     const cache = caches.get(owner), records = [];
     for (const handle of message.handles.slice(0, 1000)) {

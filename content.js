@@ -66,7 +66,8 @@
         }
         if (handles.length) {
           const result = await browser.runtime.sendMessage({type: 'cacheFollowers', owner: run.owner, handles});
-          if (!result) throw new Error('Unable to save followers on this page.');
+          if (!result) throw new Error('No reply from the extension. Reload the extension, then reload X.');
+          if (result.error) throw new Error(result.error);
           run.count = result.count;
           if (owner === run.owner) merge(result.records);
           idle = 0;

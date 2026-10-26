@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "My Homies for X",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Marks timeline authors when X explicitly reports they follow you.",
   "browser_specific_settings": {"gecko": {"id": "myhomies@local.example", "strict_min_version": "109.0"}},
   "permissions": ["storage", "webRequest", "webRequestBlocking", "https://x.com/*"],
