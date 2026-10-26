@@ -1,0 +1,3 @@
+body { width: 300px; margin: 18px; background: #101820; color: #eef5f7; font: 13px/1.5 system-ui, sans-serif; }
+h1 { font-size: 19px; margin: 0 0 10px; } p { color: #bccbd5; }
+dl { display: grid; grid-template-columns: 1fr auto; gap: 5px 12px; } dt, dd { margin: 0; }
