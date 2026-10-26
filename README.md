@@ -10,7 +10,7 @@ Highlights your followers’ display names on the X timeline using your X theme'
 
 ## Build your follower cache
 
-1. Open your profile’s **Followers** page and select **Followers**.
+1. Open your profile’s **Followers** page
 2. Click **Build follower cache**.
 3. Leave the tab open while it scrolls. When it finishes or you click **Stop**, the collected accounts replace your previous cache. Stopping early saves a partial list.
 4. Return to your timeline.
