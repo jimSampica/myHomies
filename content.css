@@ -1,15 +1,3 @@
-.myhomies-badge {
-  display: inline-flex;
-  flex-shrink: 0;
-  margin-inline-start: 6px;
-  padding: 1px 6px;
-  border: 1px solid #16886a;
-  border-radius: 5px;
-  background: #063d30;
-  color: #baf7df;
-  font: 600 11px/1.5 system-ui, sans-serif;
-  white-space: nowrap;
-}
 .myhomies-toolbar { position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: #101820; color: #eef5f7; border-bottom: 1px solid #16886a; font: 13px/1.5 system-ui, sans-serif; }
 .myhomies-toolbar button { border: 1px solid #16886a; border-radius: 6px; padding: 6px 10px; color: #baf7df; background: #063d30; cursor: pointer; font: inherit; }
 .myhomies-toolbar button:disabled { opacity: .6; cursor: wait; }
