@@ -1,6 +1,6 @@
 # My Homies for X
 
-Highlights your followers’ display names on the X timeline using your X theme's primary color.
+Highlights your followers’ display names on the X timeline using your X theme's primary color. Useful when browsing the "For You" timeline where followers are interleaved with non-followers.
 
 ## Install
 
